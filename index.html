@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<!-- 
+  DOCTYPE tells the browser this is an HTML5 document.
+  HTML5 is the latest version with modern features we'll use.
+-->
+<html lang="en">
+<head>
+    <!-- 
+      The <head> section contains metadata - information ABOUT the page
+      that doesn't appear in the visible content.
+    -->
+    
+    <!-- Character encoding - ensures special characters display correctly -->
+    <meta charset="UTF-8">
+    
+    <!-- 
+      VIEWPORT META TAG - Critical for mobile!
+      - width=device-width: Makes the page width match the device screen
+      - initial-scale=1.0: Sets the zoom level to 100% when page loads
+      Without this, mobile browsers would show a zoomed-out desktop version
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- The title that appears in the browser tab -->
+    <title>Poker Hand Tracker</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Meta Tags for PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Poker Tracker">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#2ecc71">
+    
+    <!-- iOS Icons (usando SVG temporalmente, funciona perfectamente) -->
+    <link rel="apple-touch-icon" href="assets/icon.svg">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    
+    <!-- Link to our CSS file for styling (we'll create this next) -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- 
+      The <body> contains all visible content.
+      We'll organize it into logical sections.
+    -->
+    
+    <!-- HEADER: App title and navigation -->
+    <header class="app-header">
+        <h1>🃏 Poker Hand Tracker</h1>
+        <nav class="main-nav">
+            <!-- 
+              Navigation buttons to switch between different views.
+              The 'active' class will highlight the current view.
+            -->
+            <button class="nav-btn active" data-view="session">Session</button>
+            <button class="nav-btn" data-view="track">Track Hand</button>
+            <button class="nav-btn" data-view="history">History</button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main">
+        
+        <!-- 
+          VIEW 1: SESSION SETUP
+          This is where users set up their poker session with pre-populated data.
+          The 'active' class makes this view visible by default.
+        -->
+        <section id="session-view" class="view active">
+            <h2>Start Poker Session</h2>
+            
+            <!-- 
+              FORM ELEMENT: Groups related inputs together.
+              Forms help organize data and can be submitted as a unit.
+            -->
+            <form id="session-form" class="card">
+                
+                <!-- 
+                  FORM GROUP: A container for a label and input.
+                  This keeps related elements together visually.
+                -->
+                <div class="form-group">
+                    <!-- 
+                      LABEL: Describes what the input is for.
+                      The 'for' attribute connects it to the input's 'id'.
+                      This improves accessibility and UX (clicking label focuses input).
+                    -->
+                    <label for="session-date">Date</label>
+                    
+                    <!-- 
+                      INPUT TYPE="date": Creates a date picker.
+                      - id: Unique identifier for this element
+                      - name: Used when submitting form data
+                      - required: Browser won't allow submission without this field
+                    -->
+                    <input type="date" id="session-date" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="session-place">Place</label>
+                    <!-- 
+                      INPUT TYPE="text": Basic text input.
+                      - placeholder: Gray text shown when input is empty (hint for user)
+                      - list: Connects to a datalist for autocomplete suggestions
+                    -->
+                    <input type="text" id="session-place" name="place" 
+                           placeholder="e.g., Home Game, Casino" 
+                           list="places-list" required>
+                    
+                    <!-- 
+                      DATALIST: Provides autocomplete suggestions.
+                      As user types, browser shows matching options.
+                      This saves time by remembering previous places.
+                    -->
+                    <datalist id="places-list">
+                        <!-- Options will be added dynamically by JavaScript -->
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="session-buyin">Buy-in ($)</label>
+                    <!-- 
+                      INPUT TYPE="number": Only allows numeric input.
+                      - min: Minimum allowed value
+                      - step: Increment when using up/down arrows
+                      Mobile keyboards will show number pad automatically!
+                    -->
+                    <input type="number" id="session-buyin" name="buyin" 
+                           min="0" step="1" placeholder="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="session-time">Start Time</label>
+                    <!-- 
+                      INPUT TYPE="time": Creates a time picker.
+                      Mobile devices show optimized time selection UI.
+                    -->
+                    <input type="time" id="session-time" name="time" required>
+                </div>
+
+                <!-- 
+                  BUTTON TYPE="submit": Triggers form submission.
+                  When clicked, the form's submit event fires (we'll handle with JS).
+                -->
+                <button type="submit" class="btn btn-primary">Start Session</button>
+            </form>
+
+            <!-- 
+              This section shows current session info after starting.
+              Initially hidden (display: none in CSS).
+            -->
+            <div id="current-session" class="card" style="display: none;">
+                <h3>Current Session</h3>
+                <div id="session-info">
+                    <!-- Session details will be inserted here by JavaScript -->
+                </div>
+                <div class="form-actions">
+                    <button id="go-to-track-btn" class="btn btn-primary">Go to Track Hand</button>
+                    <button id="end-session-btn" class="btn btn-secondary">End Session</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 
+          VIEW 2: HAND TRACKING
+          This is where users quickly input hand details.
+          Hidden by default (no 'active' class).
+        -->
+        <section id="track-view" class="view">
+            <h2>Track Hand</h2>
+            
+            <!-- 
+              Alert message shown when no session is active.
+              We'll show/hide this with JavaScript.
+            -->
+            <div id="no-session-alert" class="alert">
+                ⚠️ Please start a session first!
+            </div>
+
+            <form id="hand-form" class="card" style="display: none;">
+                
+                <!-- Hand Number (auto-incremented) -->
+                <div class="form-group">
+                    <label for="hand-number">Hand #</label>
+                    <input type="number" id="hand-number" name="handNumber" readonly>
+                    <!-- readonly: User can't edit, we set it automatically -->
+                </div>
+
+                <!-- Hero's Hole Cards -->
+                <div class="form-group">
+                    <label>Hero's Cards</label>
+                    <div class="card-selector">
+                        <button type="button" class="card-display" id="hero-cards-btn" data-card-slot="hero-card1">
+                            <span class="card-placeholder">Select Cards</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="hero-card1" required>
+                    <input type="hidden" id="hero-card2" required>
+                </div>
+
+                <!-- Number of Players - Slider -->
+                <div class="form-group">
+                    <label for="num-players">Number of Players</label>
+                    <div class="slider-container">
+                        <div class="slider-value" id="num-players-value">6</div>
+                        <input type="range" id="num-players" name="numPlayers"
+                               min="2" max="9" value="6" required>
+                    </div>
+                </div>
+
+                <!-- Effective Stack -->
+                <div class="form-group">
+                    <label for="effective-stack">Effective Stack ($)</label>
+                    <input type="number" id="effective-stack" name="effectiveStack"
+                           min="0" step="0.01" required class="no-spinner">
+                </div>
+
+                <!-- Position Selector - Visual Table -->
+                <div class="form-group">
+                    <label>Select Positions</label>
+                    <p class="help-text">Tap first seat for Hero, second for Villain</p>
+                    <div class="poker-table-container">
+                        <div class="poker-table">
+                            <div class="dealer-button">D</div>
+                            <div class="table-seats">
+                                <div class="seat seat-1" data-seat="1" data-position="BTN">
+                                    <span class="seat-number">1</span>
+                                    <span class="seat-position">BTN</span>
+                                </div>
+                                <div class="seat seat-2" data-seat="2" data-position="SB">
+                                    <span class="seat-number">2</span>
+                                    <span class="seat-position">SB</span>
+                                </div>
+                                <div class="seat seat-3" data-seat="3" data-position="BB">
+                                    <span class="seat-number">3</span>
+                                    <span class="seat-position">BB</span>
+                                </div>
+                                <div class="seat seat-4" data-seat="6" data-position="MP">
+                                    <span class="seat-number">6</span>
+                                    <span class="seat-position">MP</span>
+                                </div>
+                                <div class="seat seat-5" data-seat="5" data-position="UTG+1">
+                                    <span class="seat-number">5</span>
+                                    <span class="seat-position">UTG+1</span>
+                                </div>
+                                <div class="seat seat-6" data-seat="4" data-position="UTG">
+                                    <span class="seat-number">4</span>
+                                    <span class="seat-position">UTG</span>
+                                </div>
+                                <div class="seat seat-7" data-seat="7" data-position="LJ">
+                                    <span class="seat-number">7</span>
+                                    <span class="seat-position">LJ</span>
+                                </div>
+                                <div class="seat seat-8" data-seat="8" data-position="HJ">
+                                    <span class="seat-number">8</span>
+                                    <span class="seat-position">HJ</span>
+                                </div>
+                                <div class="seat seat-9" data-seat="9" data-position="CO">
+                                    <span class="seat-number">9</span>
+                                    <span class="seat-position">CO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="hero-position" required>
+                    <input type="hidden" id="villain-position">
+                    <input type="hidden" id="villain-seat">
+                </div>
+
+                <!-- Pre-Flop Action -->
+                <div class="form-group">
+                    <label for="preflop-action">Pre-Flop Action</label>
+                    <textarea id="preflop-action" name="preflopAction"
+                              rows="2" placeholder="e.g., Raise 3BB, BB calls"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="preflop-pot">Pot ($)</label>
+                    <input type="number" id="preflop-pot" name="preflopPot"
+                           min="0" step="0.01" placeholder="Pot size before flop">
+                </div>
+
+                <div class="form-group">
+                    <button type="button" id="continue-to-flop-btn" class="continue-btn" disabled>
+                        Continue to Flop
+                    </button>
+                </div>
+
+                <!-- Board Cards: Flop (Initially Hidden) -->
+                <div id="flop-section" class="section-hidden">
+                <div class="form-group">
+                    <label>Flop</label>
+                    <div class="card-selector">
+                        <button type="button" class="card-display card-display-small" data-card-slot="flop-card1">
+                            <span class="card-placeholder">Card 1</span>
+                        </button>
+                        <button type="button" class="card-display card-display-small" data-card-slot="flop-card2">
+                            <span class="card-placeholder">Card 2</span>
+                        </button>
+                        <button type="button" class="card-display card-display-small" data-card-slot="flop-card3">
+                            <span class="card-placeholder">Card 3</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="flop-card1">
+                    <input type="hidden" id="flop-card2">
+                    <input type="hidden" id="flop-card3">
+                </div>
+
+                <div class="form-group">
+                    <label for="flop-action">Flop Action</label>
+                    <textarea id="flop-action" name="flopAction"
+                              rows="2" placeholder="e.g., Check, Bet 5BB, Call"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="flop-pot">Pot ($)</label>
+                    <input type="number" id="flop-pot" name="flopPot"
+                           min="0" step="0.01" placeholder="Pot size before turn">
+                </div>
+
+                <div class="form-group">
+                    <button type="button" id="continue-to-turn-btn" class="continue-btn" disabled>
+                        Continue to Turn
+                    </button>
+                </div>
+                </div>
+
+                <!-- Board Cards: Turn (Initially Hidden) -->
+                <div id="turn-section" class="section-hidden">
+                <div class="form-group">
+                    <label>Turn</label>
+                    <div class="board-display">
+                        <div class="board-label">Board:</div>
+                        <div id="turn-board-display" class="board-cards"></div>
+                    </div>
+                    <div class="card-selector">
+                        <button type="button" class="card-display card-display-small" data-card-slot="turn-card">
+                            <span class="card-placeholder">Turn Card</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="turn-card">
+                </div>
+
+                <div class="form-group">
+                    <label for="turn-action">Turn Action</label>
+                    <textarea id="turn-action" name="turnAction"
+                              rows="2" placeholder="e.g., Check, Check"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="turn-pot">Pot ($)</label>
+                    <input type="number" id="turn-pot" name="turnPot"
+                           min="0" step="0.01" placeholder="Pot size before river">
+                </div>
+
+                <div class="form-group">
+                    <button type="button" id="continue-to-river-btn" class="continue-btn" disabled>
+                        Continue to River
+                    </button>
+                </div>
+                </div>
+
+                <!-- Board Cards: River (Initially Hidden) -->
+                <div id="river-section" class="section-hidden">
+                <div class="form-group">
+                    <label>River</label>
+                    <div class="board-display">
+                        <div class="board-label">Board:</div>
+                        <div id="river-board-display" class="board-cards"></div>
+                    </div>
+                    <div class="card-selector">
+                        <button type="button" class="card-display card-display-small" data-card-slot="river-card">
+                            <span class="card-placeholder">River Card</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="river-card">
+                </div>
+
+                <div class="form-group">
+                    <label for="river-action">River Action</label>
+                    <textarea id="river-action" name="riverAction"
+                              rows="2" placeholder="e.g., Bet 10BB, Fold"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="river-pot">Pot ($)</label>
+                    <input type="number" id="river-pot" name="riverPot"
+                           min="0" step="0.01" placeholder="Final pot size">
+                </div>
+                </div>
+
+                <!-- Villain Show Toggle -->
+                <div class="form-group">
+                    <div class="toggle-container">
+                        <label for="villain-show-toggle">Villain Show</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="villain-show-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Villain's Cards (Hidden by default) -->
+                <div id="villain-cards-section" class="section-hidden">
+                    <div class="form-group">
+                        <label>Villain's Hole Cards</label>
+                        <div class="card-selector">
+                            <button type="button" class="card-display" data-card-slot="villain-card1">
+                                <span class="card-placeholder">Card 1</span>
+                            </button>
+                            <button type="button" class="card-display" data-card-slot="villain-card2">
+                                <span class="card-placeholder">Card 2</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="villain-card1">
+                        <input type="hidden" id="villain-card2">
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="form-group">
+                    <label for="result">Result</label>
+                    <select id="result" name="result" required>
+                        <option value="">Select result...</option>
+                        <option value="win">Win</option>
+                        <option value="loss">Loss</option>
+                        <option value="split">Split Pot</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount Won/Lost ($)</label>
+                    <input type="number" id="amount" name="amount" 
+                           step="0.01" placeholder="Use negative for losses" required>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Hand</button>
+                    <button type="button" id="clear-form-btn" class="btn btn-secondary">Clear</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 
+          VIEW 3: HAND HISTORY
+          Shows all saved hands with filtering options.
+        -->
+        <section id="history-view" class="view">
+            <h2>Hand History</h2>
+            
+            <!-- Filter Controls -->
+            <div class="card filters">
+                <h3>Filters</h3>
+                <div class="filter-group">
+                    <label for="filter-date">Date</label>
+                    <input type="date" id="filter-date">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-position">Position</label>
+                    <select id="filter-position">
+                        <option value="">All Positions</option>
+                        <option value="UTG">UTG</option>
+                        <option value="UTG+1">UTG+1</option>
+                        <option value="MP">MP</option>
+                        <option value="CO">CO</option>
+                        <option value="BTN">BTN</option>
+                        <option value="SB">SB</option>
+                        <option value="BB">BB</option>
+                    </select>
+                </div>
+                <button id="apply-filters-btn" class="btn btn-secondary">Apply Filters</button>
+                <button id="clear-filters-btn" class="btn btn-secondary">Clear Filters</button>
+            </div>
+
+            <!-- Hands List -->
+            <div id="hands-list" class="hands-list">
+                <!-- Hand cards will be inserted here by JavaScript -->
+                <p class="empty-state">No hands recorded yet. Start tracking!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 
+      FOOTER: App info and credits
+    -->
+    <footer class="app-footer">
+        <p>Poker Hand Tracker v1.0 | Built for learning 📚</p>
+    </footer>
+
+    <!-- Card Selector Modal -->
+    <div id="card-selector-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Card</h3>
+                <button type="button" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="card-grid" class="card-grid">
+                    <!-- Cards will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+      Link to JavaScript files.
+      Placed at the end so HTML loads first (better performance).
+      We'll create these files next.
+    -->
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

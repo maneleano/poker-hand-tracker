@@ -1,0 +1,1315 @@
+/* 
+  ============================================
+  CSS RESET & BASE STYLES
+  ============================================
+  These rules ensure consistent appearance across different browsers.
+*/
+
+/* 
+  The * selector applies to ALL elements.
+  box-sizing: border-box makes width/height calculations easier:
+  - Without it: width = content only (padding/border add to total)
+  - With it: width = content + padding + border (more intuitive)
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 
+  ============================================
+  CSS CUSTOM PROPERTIES (Variables)
+  ============================================
+  Define reusable values. Change once, updates everywhere!
+  Syntax: --variable-name: value;
+  Use with: var(--variable-name)
+*/
+:root {
+    /* Color Palette - Professional poker theme */
+    --primary-color: #2ecc71;      /* Green - like poker felt */
+    --primary-dark: #27ae60;       /* Darker green for hover states */
+    --secondary-color: #3498db;    /* Blue for secondary actions */
+    --danger-color: #e74c3c;       /* Red for warnings/losses */
+    --success-color: #2ecc71;      /* Green for wins */
+    --dark-bg: #1a1a1a;           /* Dark background */
+    --card-bg: #2c2c2c;           /* Card/panel background */
+    --text-primary: #ffffff;       /* Main text color */
+    --text-secondary: #b0b0b0;     /* Secondary text (less important) */
+    --border-color: #404040;       /* Border color for elements */
+    
+    /* 4-Color Deck */
+    --spades-color: #000000;       /* Black */
+    --hearts-color: #e74c3c;       /* Red */
+    --clubs-color: #27ae60;        /* Dark Green */
+    --diamonds-color: #3498db;     /* King Blue */
+    
+    /* Spacing System - Consistent spacing throughout app */
+    --spacing-xs: 0.25rem;  /* 4px */
+    --spacing-sm: 0.5rem;   /* 8px */
+    --spacing-md: 1rem;     /* 16px */
+    --spacing-lg: 1.5rem;   /* 24px */
+    --spacing-xl: 2rem;     /* 32px */
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.5rem;     /* 24px */
+    
+    /* Border Radius - Rounded corners */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* Shadows - Depth and elevation */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 
+  ============================================
+  BODY & GENERAL LAYOUT
+  ============================================
+*/
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;  /* Space between lines of text */
+    color: var(--text-primary);
+    background-color: var(--dark-bg);
+    
+    /* 
+      Prevent horizontal scrolling on mobile.
+      overflow-x: hidden hides any content that extends beyond screen width.
+    */
+    overflow-x: hidden;
+}
+
+/* 
+  ============================================
+  HEADER STYLES
+  ============================================
+*/
+.app-header {
+    background-color: var(--card-bg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    
+    /* 
+      position: sticky makes header stay at top when scrolling.
+      top: 0 means it sticks to the very top.
+      z-index: 100 ensures it stays above other content.
+    */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-header h1 {
+    font-size: var(--font-size-xl);
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    color: var(--primary-color);
+}
+
+/* 
+  ============================================
+  NAVIGATION STYLES
+  ============================================
+*/
+.main-nav {
+    /* 
+      Flexbox - Modern layout system for arranging items.
+      display: flex makes children arrange in a row by default.
+    */
+    display: flex;
+    gap: var(--spacing-sm);  /* Space between buttons */
+    justify-content: center;  /* Center buttons horizontally */
+}
+
+.nav-btn {
+    /* 
+      flex: 1 makes all buttons equal width.
+      They'll grow to fill available space equally.
+    */
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;  /* Shows hand cursor on hover */
+    
+    /* 
+      Transition - Smooth animation when properties change.
+      Format: property duration timing-function
+    */
+    transition: all 0.3s ease;
+}
+
+/* 
+  Pseudo-class :hover applies when user hovers over element.
+  Great for providing visual feedback!
+*/
+.nav-btn:hover {
+    background-color: var(--border-color);
+    transform: translateY(-2px);  /* Slight lift effect */
+}
+
+/* 
+  .active class indicates the currently selected navigation item.
+  We'll add/remove this class with JavaScript.
+*/
+.nav-btn.active {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+    border-color: var(--primary-color);
+}
+
+/* 
+  ============================================
+  MAIN CONTENT AREA
+  ============================================
+*/
+.app-main {
+    padding: var(--spacing-lg);
+    max-width: 600px;  /* Limit width for readability */
+    margin: 0 auto;    /* Center the content */
+    
+    /* 
+      min-height ensures content area is at least as tall as viewport.
+      calc() lets us do math: 100vh (full height) minus header height.
+    */
+    min-height: calc(100vh - 200px);
+}
+
+/* 
+  ============================================
+  VIEW MANAGEMENT
+  ============================================
+  Only one view is visible at a time.
+*/
+.view {
+    display: none;  /* Hidden by default */
+}
+
+.view.active {
+    display: block;  /* Visible when active */
+    
+    /* 
+      Animation when view appears.
+      @keyframes fadeIn is defined at the bottom of this file.
+    */
+    animation: fadeIn 0.3s ease;
+}
+
+.view h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-color);
+}
+
+/* 
+  ============================================
+  CARD COMPONENT
+  ============================================
+  Reusable container for grouped content.
+*/
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.card h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+/* 
+  ============================================
+  FORM STYLES
+  ============================================
+*/
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: block;  /* Makes label take full width */
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;  /* Slightly bold */
+}
+
+/* 
+  Group selector - applies to all these input types.
+  Comma separates multiple selectors.
+*/
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;  /* Full width of container */
+    padding: var(--spacing-md);
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+    transition: border-color 0.3s ease;
+}
+
+/* 
+  :focus pseudo-class applies when input is selected/active.
+  outline: none removes default browser outline.
+  We replace it with our custom border color.
+*/
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Remove spinner arrows from number inputs */
+input[type="number"].no-spinner::-webkit-outer-spin-button,
+input[type="number"].no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"].no-spinner {
+    -moz-appearance: textfield;
+}
+
+/* 
+  Placeholder text styling.
+  ::placeholder is a pseudo-element for the placeholder text.
+*/
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* Help text below inputs */
+.help-text {
+    display: block;
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* 
+  ============================================
+  CARD SELECTOR (for poker cards)
+  ============================================
+*/
+.card-selector {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.card-selector input {
+    flex: 1;  /* Equal width for both card inputs */
+    text-align: center;
+    text-transform: uppercase;  /* Converts input to uppercase */
+    font-weight: bold;
+/* Card Display Buttons */
+.card-display {
+    flex: 1;
+    min-width: 80px;
+    height: 60px;
+    background-color: var(--dark-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.card-display-small {
+    min-width: 60px;
+    height: 50px;
+    font-size: var(--font-size-sm);
+}
+
+.card-display:hover {
+    border-color: var(--primary-color);
+    background-color: var(--border-color);
+}
+
+.card-display.has-card {
+    border-color: var(--primary-color);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.card-placeholder {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.card-display.has-card .card-placeholder {
+    display: none;
+}
+
+/* Card value display */
+.card-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-display-small .card-value {
+    font-size: 1.2rem;
+}
+
+/* Suit colors - 4-color deck */
+.card-display.spades {
+    color: var(--spades-color);
+}
+
+.card-display.hearts {
+    color: var(--hearts-color);
+}
+
+.card-display.clubs {
+    color: var(--clubs-color);
+}
+
+.card-display.diamonds {
+    color: var(--diamonds-color);
+}
+
+}
+
+/* 
+  ============================================
+  BUTTON STYLES
+  ============================================
+*/
+.btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* 
+      width: 100% makes button full width on mobile.
+      We'll override this for larger screens later.
+    */
+    width: 100%;
+}
+
+/* Primary button - main actions */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Secondary button - less important actions */
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* 
+  :active pseudo-class applies when button is being clicked.
+  Creates a "pressed" effect.
+*/
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Container for multiple buttons */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+}
+
+.form-actions .btn {
+    width: auto;  /* Override full width */
+    flex: 1;      /* But still share space equally */
+}
+
+/* 
+  ============================================
+  ALERT COMPONENT
+  ============================================
+*/
+.alert {
+    padding: var(--spacing-md);
+    background-color: rgba(231, 76, 60, 0.2);  /* Semi-transparent red */
+    border-left: 4px solid var(--danger-color);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+}
+
+/* 
+  ============================================
+  HANDS LIST (History View)
+  ============================================
+*/
+.filters {
+    margin-bottom: var(--spacing-lg);
+}
+
+.filter-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.hands-list {
+    display: flex;
+    flex-direction: column;  /* Stack items vertically */
+    gap: var(--spacing-md);
+}
+
+/* Individual hand card in history */
+.hand-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-left: 4px solid var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hand-card:hover {
+    transform: translateX(4px);  /* Slide right on hover */
+    box-shadow: var(--shadow-lg);
+}
+
+/* Win/Loss indicator */
+.hand-card.win {
+    border-left-color: var(--success-color);
+}
+
+.hand-card.loss {
+    border-left-color: var(--danger-color);
+}
+
+.hand-card-header {
+    display: flex;
+    justify-content: space-between;  /* Space items apart */
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.hand-card-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.hand-card-amount {
+    font-weight: bold;
+    font-size: var(--font-size-lg);
+}
+
+.hand-card-amount.positive {
+    color: var(--success-color);
+}
+
+.hand-card-amount.negative {
+    color: var(--danger-color);
+}
+
+.hand-card-details {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--spacing-xl);
+    font-style: italic;
+}
+
+/* 
+  ============================================
+  FOOTER
+  ============================================
+*/
+.app-footer {
+    background-color: var(--card-bg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xl);
+}
+
+/* 
+  ============================================
+  ANIMATIONS
+  ============================================
+  @keyframes defines reusable animations.
+*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;  /* Start invisible */
+        transform: translateY(10px);  /* Start slightly below */
+    }
+    to {
+        opacity: 1;  /* End fully visible */
+        transform: translateY(0);  /* End at normal position */
+    }
+}
+
+/* 
+  ============================================
+  RESPONSIVE DESIGN - TABLET & DESKTOP
+  ============================================
+  @media queries apply styles only when conditions are met.
+  min-width: 768px means "screens 768px wide or larger"
+*/
+@media (min-width: 768px) {
+    /* Larger text on bigger screens */
+    .app-header h1 {
+        font-size: 2rem;
+    }
+    
+    /* More padding on larger screens */
+    .app-main {
+        padding: var(--spacing-xl);
+    }
+    
+    /* Buttons don't need full width on desktop */
+    .btn {
+        width: auto;
+        min-width: 150px;
+    }
+    
+    /* Card selector can be wider */
+    .card-selector input {
+        max-width: 100px;
+    }
+    
+    /* Poker table - larger on tablets and desktops */
+    .poker-table {
+        max-width: 450px;
+        height: 600px;
+    }
+    
+    .seat {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .seat-number {
+        font-size: 0.95rem;
+    }
+    
+    .seat-position {
+        font-size: 0.75rem;
+    }
+    
+    .dealer-button {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+    }
+}
+
+/* Extra large screens - even bigger table */
+@media (min-width: 1200px) {
+    .poker-table {
+        max-width: 500px;
+        height: 650px;
+    }
+    
+    .seat {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .seat-number {
+        font-size: 1.05rem;
+    }
+    
+    .seat-position {
+        font-size: 0.85rem;
+    }
+    
+    .dealer-button {
+        width: 55px;
+        height: 55px;
+        font-size: 1.5rem;
+    }
+}
+
+/* 
+  ============================================
+  UTILITY CLASSES
+  ============================================
+  Reusable classes for common needs.
+*/
+
+/* Hide element but keep it in DOM */
+.hidden {
+    display: none !important;  /* !important overrides other display rules */
+}
+
+/* Text alignment utilities */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Margin utilities */
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+/*
+  ============================================
+  MODAL (Card Selector Popup)
+  ============================================
+*/
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+}
+
+/*
+  ============================================
+  CARD GRID (52 cards display)
+  ============================================
+*/
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* 4 columns - one per suit */
+    gap: 0.4rem;  /* Reduced gap for smaller cards */
+    max-height: 60vh;  /* Limit height */
+    overflow-y: auto;  /* Allow scrolling if needed */
+}
+
+.card-grid-item {
+    aspect-ratio: 2/3;
+    background-color: var(--dark-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    font-size: 1.5rem;  /* Increased from 1.2rem */
+    position: relative;
+    padding: 0.25rem;
+}
+
+.card-grid-item:hover {
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    z-index: 1;
+}
+
+.card-grid-item.selected {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+.card-grid-item.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Suit-specific colors - 4-color deck */
+.card-grid-item.spades {
+    color: var(--spades-color);
+}
+
+.card-grid-item.hearts {
+    color: var(--hearts-color);
+}
+
+/* 
+  ============================================
+  POKER TABLE LAYOUT
+  ============================================
+*/
+.poker-table-container {
+    background: linear-gradient(145deg, #1a1a1a 0%, #2c2c2c 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.poker-table {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    height: 500px;
+    margin: 0 auto;
+    background: radial-gradient(ellipse at center, #1a5c3a 0%, #0d3d26 50%, #0a2e1c 100%);
+    border-radius: 50% / 45%;
+    border: 8px solid #6b4423;
+    box-shadow:
+        inset 0 0 30px rgba(0, 0, 0, 0.5),
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 0 2px #4a2f1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+/* Inner felt texture effect */
+.poker-table::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 10%;
+    bottom: 10%;
+    border-radius: 50% / 45%;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+.dealer-button {
+    position: absolute;
+    bottom: 15%;
+    right: 20%;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(145deg, #ffffff 0%, #e0e0e0 100%);
+    border: 3px solid #2c2c2c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #2c2c2c;
+    font-size: 1.3rem;
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.dealer-button:hover {
+    transform: scale(1.05);
+}
+
+.table-seats {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.seat {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #2c2c2c 0%, #1a1a1a 100%);
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    z-index: 5;
+}
+
+.seat:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.15);
+    box-shadow:
+        0 6px 12px rgba(46, 204, 113, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    z-index: 15;
+}
+
+.seat.hero {
+    background: linear-gradient(145deg, #2ecc71 0%, #27ae60 100%);
+    border-color: #1e8449;
+    color: white;
+    font-weight: bold;
+    box-shadow:
+        0 6px 12px rgba(46, 204, 113, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    animation: pulse-hero 2s ease-in-out infinite;
+}
+
+.seat.villain {
+    background: linear-gradient(145deg, #e74c3c 0%, #c0392b 100%);
+    border-color: #922b21;
+    color: white;
+    font-weight: bold;
+    box-shadow:
+        0 6px 12px rgba(231, 76, 60, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    animation: pulse-villain 2s ease-in-out infinite;
+}
+
+.seat.active {
+    background: linear-gradient(145deg, #3498db 0%, #2980b9 100%);
+    border-color: #1f5f8b;
+    color: white;
+    box-shadow:
+        0 6px 12px rgba(52, 152, 219, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.seat-number {
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.seat-position {
+    font-size: 0.65rem;
+    margin-top: 2px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Seat positions - Optimized oval layout */
+.seat-1 { bottom: 5%; right: 25%; }                                /* BTN - Bottom right */
+.seat-2 { bottom: 5%; left: 25%; }                                 /* SB - Bottom left */
+.seat-3 { bottom: 30%; left: 2%; }                                 /* BB - Lower left */
+.seat-4 { top: 5%; left: 50%; transform: translateX(-50%); }      /* MP - Top center */
+.seat-5 { top: 20%; left: 2%; }                                    /* UTG+1 - Upper left */
+.seat-6 { top: 50%; left: -2%; transform: translateY(-50%); }     /* UTG - Middle left */
+.seat-7 { top: 20%; right: 2%; }                                   /* LJ - Upper right */
+.seat-8 { top: 50%; right: -2%; transform: translateY(-50%); }    /* HJ - Middle right */
+.seat-9 { bottom: 30%; right: 2%; }                                /* CO - Lower right */
+
+/* Pulse animations for hero and villain */
+@keyframes pulse-hero {
+    0%, 100% {
+        box-shadow:
+            0 6px 12px rgba(46, 204, 113, 0.4),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 6px 20px rgba(46, 204, 113, 0.6),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+}
+
+@keyframes pulse-villain {
+    0%, 100% {
+        box-shadow:
+            0 6px 12px rgba(231, 76, 60, 0.4),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 6px 20px rgba(231, 76, 60, 0.6),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 
+  ============================================
+  RANGE SLIDER (Player Count)
+  ============================================
+*/
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.slider-value {
+    text-align: center;
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: var(--radius-md);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--primary-dark);
+    transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: var(--primary-dark);
+    transform: scale(1.2);
+}
+
+/* 
+  ============================================
+  TOGGLE SWITCH (Villain Show)
+  ============================================
+*/
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: 0.4s;
+    border-radius: 30px;
+/* 
+  ============================================
+  BOARD DISPLAY
+  ============================================
+*/
+.board-display {
+    background-color: var(--dark-bg);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.board-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.board-cards {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.board-card {
+    min-width: 50px;
+    height: 40px;
+    background-color: white;  /* White background for better visibility */
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.board-card.spades {
+    color: var(--spades-color);
+    border-color: var(--spades-color);
+}
+
+.board-card.hearts {
+    color: var(--hearts-color);
+    border-color: var(--hearts-color);
+}
+
+.board-card.clubs {
+    color: var(--clubs-color);
+    border-color: var(--clubs-color);
+}
+
+.board-card.diamonds {
+    color: var(--diamonds-color);
+    border-color: var(--diamonds-color);
+}
+
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--primary-color);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+/* 
+  ============================================
+  CONTINUE BUTTON
+  ============================================
+*/
+.continue-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+.continue-btn:hover:not(:disabled) {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.continue-btn:disabled {
+    background-color: var(--border-color);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 
+  ============================================
+  SECTION VISIBILITY
+  ============================================
+*/
+.section-hidden {
+    display: none !important;
+}
+
+.section-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.card-grid-item.clubs {
+    color: var(--clubs-color);
+}
+
+.card-grid-item.diamonds {
+    color: var(--diamonds-color);
+}
+
+.card-grid-item.selected {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--dark-bg) !important;
+}
+
+.card-rank {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.card-suit {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/*
+  ============================================
+  ACCESSIBILITY IMPROVEMENTS
+  ============================================
+*/
+
+/*
+  Focus visible - shows outline only when using keyboard navigation.
+  This helps keyboard users while keeping mouse clicks clean.
+*/
+*:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Ensure sufficient color contrast for readability */
+::selection {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+/* Made with Bob */

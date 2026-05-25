@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#2ecc71" rx="100"/>
+  
+  <!-- Poker Card Symbol -->
+  <g transform="translate(256, 256)">
+    <!-- Spade -->
+    <path d="M 0,-80 C -30,-80 -50,-60 -50,-30 C -50,-10 -40,0 -20,10 L -30,40 L 30,40 L 20,10 C 40,0 50,-10 50,-30 C 50,-60 30,-80 0,-80 Z" 
+          fill="white" stroke="#1a1a1a" stroke-width="3"/>
+    
+    <!-- Text -->
+    <text x="0" y="100" font-family="Arial, sans-serif" font-size="80" font-weight="bold" 
+          fill="white" text-anchor="middle" stroke="#1a1a1a" stroke-width="2">🃏</text>
+  </g>
+</svg>
+
+<!-- Made with Bob -->
